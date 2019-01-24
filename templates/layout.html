@@ -20,6 +20,7 @@
               <h1>Blog</h1>
 
               <form method="POST" action="{{url_for('search')}}">
+                {{ form.hidden_tag() }}
              <input type="text" name="searchinput" placeholder="Search" >
 
              <br>
