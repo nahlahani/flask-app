@@ -1,7 +1,9 @@
 {% extends 'layout.html' %}
 {% block body %}
+{% if session.logged_in %}
 <h1>Add Article</h1>
 <form method="POST" action="">
+	{{ form.hidden_tag() }}
 <div class="form-group">
 	{{ form.title.label(class="form-control-label") }}
 	{{ form.title(class="form-control form-control-lg") }}
@@ -12,4 +14,8 @@
 	<input type="submit" class="btn btn-primary" value="Submit">
 </div> 
 </form>
+{% else %}
+<h1>Not Allowed</h1>
+
+{% endif %}
 {% endblock %}

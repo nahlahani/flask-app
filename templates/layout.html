@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css')}}" />
   </head>
   <body id="top">
-        <section id="banner" data-video="images/banner">
+
+        <section id="banner" >
           <div class="inner">
             {% if session.logged_in %}
                 <a class="nav-link pull-top" href="/logout">Logout</a>

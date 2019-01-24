@@ -4,7 +4,10 @@ from wtforms.form import Form
 from wtforms import StringField, TextAreaField, PasswordField, validators, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from flask_mysqldb import MySQL
+from passlib.hash import sha256_crypt
 app = Flask(__name__)
+
+
 #Config MySQL
 app.config['MYSQL_HOST']= 'localhost'
 app.config['MYSQL_USER']='root'
@@ -13,6 +16,7 @@ app.config['MYSQL_DB']='articleapp'
 app.config['MYSQL_CURSORCLASS'] ='DictCursor'
 #init MYSQL
 app.config['SECRET_KEY'] = '18fa55c8857033de91bfa3d59cb4467c'
+
 
 mysql = MySQL(app)
 
@@ -49,14 +53,21 @@ class LoginForm(FlaskForm):
 @app.route('/admin', methods=['GET', 'POST'])
 def login():
 	form = LoginForm()
-	if form.validate_on_submit():
-		if form.username.data == 'admin' and form.password.data == 'whatever':
-			session['logged_in'] = True
-			session['username']= form.username.data
-			flash('You have Been logged in!', 'success')
-			return redirect(url_for('index'))
-		else:
-			flash('Login Unsuccessful. Please Get the Fuck Out', 'danger')
+	if request.method=="POST" and form.validate_on_submit():
+		username = form.username.data
+		password_input = form.password.data
+		cur = mysql.connection.cursor()
+		result = cur.execute("SELECT * FROM users WHERE username =%s", [username])
+		if result > 0:
+			data=cur.fetchone()
+			password = sha256_crypt.encrypt(str(data['password']))
+			if sha256_crypt.verify(password_input, password):
+				session['logged_in'] = True
+				session['username']= form.username.data
+				flash('You have Been logged in!', 'success')
+				return redirect(url_for('index'))
+			else:
+				flash('Login Unsuccessful.', 'danger')
 	return render_template('admin.html', title='Admin Panel', form=form)
 
 
@@ -65,9 +76,9 @@ def login():
 def logout():
 	session.clear()
 	flash('You are now logout', 'success')
-	return redirect(url_for('login'))
+	return redirect(url_for('index'))
 
-class ArticleForm(Form):
+class ArticleForm(FlaskForm):
 	title = StringField('Title', [validators.Length(min=1, max=200)])
 	body = TextAreaField('Body', [validators.Length(min=30)])
 
@@ -75,7 +86,7 @@ class ArticleForm(Form):
 @app.route('/add_article', methods=['GET', 'POST'])
 def add_article():
 	form = ArticleForm(request.form)
-	if request.method == 'POST' and form.validate():
+	if request.method == 'POST' and form.validate() and session['logged_in'] == True:
 		title = form.title.data
 		body = form.body.data
 
@@ -102,7 +113,7 @@ def edit_article(id):
 	form.title.data = article['title']
 	form.body.data = article['body']
 
-	if request.method == 'POST' and form.validate():
+	if request.method == 'POST' and form.validate() and session['logged_in'] == True:
 		title = request.form['title']
 		body = request.form['body']
 
@@ -117,12 +128,13 @@ def edit_article(id):
 #DELETE ARTICLE
 @app.route('/delete_article/<string:id>', methods=['POST'])
 def delete_article(id):
-	cur= mysql.connection.cursor()
-	cur.execute("DELETE FROM articles WHERE id=%s", [id])
-	mysql.connection.commit()
-	cur.close()
-	flash('article deleted', 'danger')
-	return redirect(url_for('index'))
+	if session['logged_in'] == True:
+		cur= mysql.connection.cursor()
+		cur.execute("DELETE FROM articles WHERE id=%s", [id])
+		mysql.connection.commit()
+		cur.close()
+		flash('article deleted', 'danger')
+		return redirect(url_for('index'))
 
 
 #Search 
@@ -139,5 +151,4 @@ def search():
 	cur.close()
 
 if __name__ == '__main__':
-	app.secret_key='Secret010'
-	app.run(debug=True)
+	app.run()

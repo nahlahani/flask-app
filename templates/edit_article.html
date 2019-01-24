@@ -1,15 +1,22 @@
 {% extends 'layout.html' %}
 {% block body %}
+{% if session.logged_in %}
 <h1>Edit Article</h1>
+
 <form method="POST" action="">
+{{ form.hidden_tag() }}
 <div class="form-group">
-	{{ form.title.label(class="form-control-label") }}
+	{{ form.title.label(class="form-control-label" ) }}
 	{{ form.title(class="form-control form-control-lg") }}
 
 	{{ form.body.label(class="form-control-label") }}
 	{{ form.body(class="form-control form-control-lg") }}
 	<br>
-	<input type="submit" class="btn btn-primary" value="Submit">
+	<input type="submit" class="btn btn-primary" value="Submit" >
 </div> 
 </form>
+
+{% else %}
+<h1>You are not Allowed </h1>
+{% endif %}
 {% endblock %}
