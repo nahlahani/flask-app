@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Blog</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css')}}" />
+  </head>
+  <body id="top">
+        <section id="banner" data-video="images/banner">
+          <div class="inner">
+            {% if session.logged_in %}
+                <a class="nav-link pull-top" href="/logout">Logout</a>
+                <br>
+                <a class="nav-link pull-top" href="/add_article">Add Article</a>
+            {% endif %}
+            <header>
+
+              <h1>Blog</h1>
+
+              <form method="POST" action="{{url_for('search')}}">
+             <input type="text" name="searchinput" placeholder="Search" >
+
+             <br>
+              <input type="submit" class="btn btn-primary" value="Submit">
+              </form>
+
+            </header>
+            <a href="#main" class="more">Learn More</a>
+          </div>
+        </section>
+
+      <!-- Main -->
+        <div id="main">
+          <div class="inner"> 
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              {{message}}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            {% block body %} {% endblock %}           
+            
+          </div>
+        </div>
+
+      
+
+    <!-- Scripts -->
+      <script src="static/assets/js/jquery.min.js"></script>
+      <script src="static/assets/js/jquery.scrolly.min.js"></script>
+      <script src="static/assets/js/jquery.poptrox.min.js"></script>
+      <script src="static/assets/js/skel.min.js"></script>
+      <script src="static/assets/js/util.js"></script>
+      <script src="static/assets/js/main.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% block body %}
+<h1>Edit Article</h1>
+<form method="POST" action="">
+<div class="form-group">
+	{{ form.title.label(class="form-control-label") }}
+	{{ form.title(class="form-control form-control-lg") }}
+
+	{{ form.body.label(class="form-control-label") }}
+	{{ form.body(class="form-control form-control-lg") }}
+	<br>
+	<input type="submit" class="btn btn-primary" value="Submit">
+</div> 
+</form>
+{% endblock %}
